@@ -22,6 +22,7 @@ fun MainPage(viewModel: GetBlockViewModel) {
 
     LaunchedEffect(Unit) {
         viewModel.fetchEpoch()
+        viewModel.fetchSupply()
     }
 
     Column {
@@ -65,7 +66,7 @@ fun MainPage(viewModel: GetBlockViewModel) {
                 .background(color = AppColors.Background)
                 .padding(20.dp)
         ) {
-            SOLSupplyBlock()
+            SOLSupplyBlock(viewModel)
             Spacer(Modifier.height(20.dp))
             CurrentEpochBlock(viewModel)
         }
@@ -118,7 +119,8 @@ fun SearchBar(text: String, onTextChange: (String) -> Unit, onSearchClick: () ->
 }
 
 @Composable
-fun SOLSupplyBlock() {
+fun SOLSupplyBlock(viewModel: GetBlockViewModel) {
+    val supply by viewModel.supply.collectAsState()
     Box(
         modifier = Modifier
             .background(color = AppColors.BackgroundInfo)
@@ -131,7 +133,7 @@ fun SOLSupplyBlock() {
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                text = "596,037,910.89",
+                text = supply.toString(),
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
@@ -155,7 +157,7 @@ fun CurrentEpochBlock(viewModel: GetBlockViewModel) {
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                text = epoch ?: "Loading...",
+                text = epoch.toString(),
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )

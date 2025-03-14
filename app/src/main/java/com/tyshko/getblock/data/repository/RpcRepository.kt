@@ -18,16 +18,14 @@ import kotlinx.serialization.json.Json
 class RpcRepository {
 
     private val client = HttpClient {
-        install(ContentNegotiation){
-            json(
-                Json {
-                    encodeDefaults = true
-                    ignoreUnknownKeys = true
-                }
-
-            )
+        install(ContentNegotiation) {
+            json(Json {
+                encodeDefaults = true
+                prettyPrint = true
+                isLenient = true
+                ignoreUnknownKeys = true
+            })
         }
-
         install(Logging) {
             level = LogLevel.ALL
             logger = Logger.DEFAULT
