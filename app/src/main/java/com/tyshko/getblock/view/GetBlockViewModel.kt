@@ -12,9 +12,9 @@ import kotlinx.coroutines.launch
 
 
 class GetBlockViewModel : ViewModel() {
-    private val repository = RpcRepository()
+    private val repository: RpcRepository = RpcRepository()
 
-    private val _epoch = MutableStateFlow<GetEpochInfo?>(null)
+    private var _epoch = MutableStateFlow<GetEpochInfo?>(null)
     val epoch: StateFlow<GetEpochInfo?> get() = _epoch
 
     private val _supply = MutableStateFlow<GetSupply?>(null)
@@ -28,7 +28,7 @@ class GetBlockViewModel : ViewModel() {
     fun fetchEpoch() {
         viewModelScope.launch {
             try {
-                val response: RpcResponse<GetEpochInfo> = repository.getEpoch()
+                val response = repository.getEpoch()
                 _epoch.value = response.result
             } catch (e: Exception) {
                 _epoch.value = null
@@ -47,5 +47,9 @@ class GetBlockViewModel : ViewModel() {
                 Log.e("GetBlockViewModel", "Ошибка при получении Supply: ${e.message}", e)
             }
         }
+    }
+
+    companion object{
+        const val TIME_OUT = 60_000
     }
 }

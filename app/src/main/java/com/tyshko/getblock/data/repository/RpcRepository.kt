@@ -1,6 +1,8 @@
 package com.tyshko.getblock.data.repository
 
+import android.util.Log
 import com.tyshko.getblock.data.HTTPRouts
+import com.tyshko.getblock.models.block.GetBlock
 import com.tyshko.getblock.models.epoch.GetEpochInfo
 import com.tyshko.getblock.models.rpc.RpcRequest
 import com.tyshko.getblock.models.rpc.RpcResponse
@@ -21,8 +23,6 @@ class RpcRepository {
         install(ContentNegotiation) {
             json(Json {
                 encodeDefaults = true
-                prettyPrint = true
-                isLenient = true
                 ignoreUnknownKeys = true
             })
         }
@@ -33,7 +33,7 @@ class RpcRepository {
     }
 
     suspend fun getEpoch(): RpcResponse<GetEpochInfo>{
-        val request = RpcRequest(jsonrpc = "2.0", id = "getblock.io", method = "getEpochInfo", params = emptyList())
+        val request = RpcRequest(method = "getEpochInfo")
 
         val response = client.post(HTTPRouts.BASE_URL){
             contentType(ContentType.Application.Json)
@@ -45,7 +45,7 @@ class RpcRepository {
     }
 
     suspend fun getSupply(): RpcResponse<GetSupply>{
-        val request = RpcRequest(jsonrpc = "2.0", id = "getblock.io", method = "getSupply")
+        val request = RpcRequest(method = "getSupply")
 
         val response = client.post(HTTPRouts.BASE_URL){
             contentType(ContentType.Application.Json)
@@ -55,7 +55,6 @@ class RpcRepository {
 
         return response
     }
-
 
 
 }

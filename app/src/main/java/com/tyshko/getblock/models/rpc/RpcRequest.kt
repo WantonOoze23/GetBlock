@@ -5,8 +5,9 @@ import kotlinx.serialization.json.JsonElement
 
 @Serializable
 data class RpcRequest(
-    val id: String,
-    val jsonrpc: String,
-    val params: List<JsonElement>? = emptyList(),
-    val method: String
+    val jsonrpc: String = "2.0",
+    val id: String = "getblock.io",
+    val method: String,
+    val params: List<JsonElement> = emptyList()
 )
+
