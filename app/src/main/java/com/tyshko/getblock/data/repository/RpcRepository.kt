@@ -51,9 +51,8 @@ class RpcRepository {
             contentType(ContentType.Application.Json)
             header("x-api-key", HTTPRouts.X_API_KEY)
             setBody(request)
-        }.body<RpcResponse<GetSupply>>()
-
-        return response
+        }
+        return response.body<RpcResponse<GetSupply>>()
     }
 
 
