@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tyshko.getblock.data.repository.RpcRepository
-import com.tyshko.getblock.models.rpc.RpcResponse
 import com.tyshko.getblock.models.stack.UiStack
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -32,18 +31,18 @@ class GetBlockViewModel : ViewModel() {
                 try {
                     val response = repository.getEpoch()
 
-                    val absoluteSlot = response.result?.absoluteSlot
-                    val blockHeight = response.result?.blockHeight
-                    val epoch = response.result?.epoch
-                    val slotIndex = response.result?.slotIndex
-                    val slotsInEpoch = response.result?.slotsInEpoch
+                    val absoluteSlot = response.result.absoluteSlot
+                    val blockHeight = response.result.blockHeight
+                    val epoch = response.result.epoch
+                    val slotIndex = response.result.slotIndex
+                    val slotsInEpoch = response.result.slotsInEpoch
 
                     _stack.value = _stack.value.copy(
-                        absoluteSlotEpoch = absoluteSlot ?: 0,
-                        blockHeightEpoch = blockHeight ?: 0,
-                        epoch = epoch ?: 0,
-                        slotIndexEpoch = slotIndex ?: 0,
-                        slotsInEpochEpoch = slotsInEpoch ?: 0,
+                        absoluteSlotEpoch = absoluteSlot,
+                        blockHeightEpoch = blockHeight,
+                        epoch = epoch,
+                        slotIndexEpoch = slotIndex,
+                        slotsInEpochEpoch = slotsInEpoch,
                     )
 
                 } catch (e: Exception) {
@@ -60,15 +59,22 @@ class GetBlockViewModel : ViewModel() {
                 try {
                     val response = repository.getSupply()
 
-                    val circulating = response.result?.value?.circulating
-                    val nonCirculating = response.result?.value?.nonCirculating
-                    val total = response.result?.value?.total
+                    val circulating = response.result.value.circulating
+                    val nonCirculating = response.result.value.nonCirculating
+                    val total = response.result.value.total
 
-                    _stack.value = _stack.value.copy(
-                        circulatingSupply = circulating ?: 0L,
-                        nonCirculatingSupply = nonCirculating ?: 0L,
-                        totalSupply = total ?: 0L,
-                    )
+                    val percentCirculating = (circulating.toDouble() / total.toDouble()) * 100
+                    val percentNonCirculating = (nonCirculating.toDouble() / total.toDouble()) * 100
+
+                    _stack.update { current ->
+                        current.copy(
+                            circulatingSupply = circulating,
+                            nonCirculatingSupply = nonCirculating,
+                            totalSupply = total,
+                            percentCirculatingSupply = percentCirculating,
+                            percentNonCirculatingSupply = percentNonCirculating,
+                        )
+                    }
 
                 } catch (e: Exception) {
                     Log.e("GetBlockViewModel", "Ошибка при получении Supply: ${e.message}", e)

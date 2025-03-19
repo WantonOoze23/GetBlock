@@ -1,6 +1,7 @@
 package com.tyshko.getblock.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -9,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -19,6 +21,8 @@ import com.tyshko.getblock.view.GetBlockViewModel
 @Composable
 fun MainPage(viewModel: GetBlockViewModel) {
     var text by remember { mutableStateOf("") }
+
+    val supply by viewModel.stack.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.fetchEpoch()
@@ -69,6 +73,10 @@ fun MainPage(viewModel: GetBlockViewModel) {
             SOLSupplyBlock(viewModel)
             Spacer(Modifier.height(20.dp))
             CurrentEpochBlock(viewModel)
+            Text(
+                text = supply.toString(),
+                fontSize = 10.sp
+            )
         }
     }
 }
@@ -120,47 +128,91 @@ fun SearchBar(text: String, onTextChange: (String) -> Unit, onSearchClick: () ->
 
 @Composable
 fun SOLSupplyBlock(viewModel: GetBlockViewModel) {
-    val supply by viewModel.supply.collectAsState()
+    val supply by viewModel.stack.collectAsState()
+
     Box(
         modifier = Modifier
-            .background(color = AppColors.BackgroundInfo)
-            .height(100.dp)
+            .background(AppColors.BackgroundInfo, shape = RoundedCornerShape(12.dp))
+            .fillMaxWidth()
     ) {
-        Column {
+        Column(
+            modifier = Modifier
+                .padding(10.dp)
+        ) {
             Text(
                 text = "SOL Supply",
-                fontSize = 20.sp
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                text = supply.toString(),
+                text = supply.totalSupply.toString(),
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
+            Spacer(Modifier.height(10.dp))
+
+            Column {
+                Text("Circulating Supply")
+                Text(
+                    text = "${supply.circulatingSupply} SOL (${String.format("%.1f", supply.percentCirculatingSupply)}%)"
+                )
+
+                Spacer(Modifier.height(5.dp))
+
+                Text("Non-circulating Supply")
+                Text(
+                    text = "${supply.nonCirculatingSupply} SOL (${String.format("%.1f", supply.percentNonCirculatingSupply)}%)"
+                )
+            }
         }
     }
 }
 
+
 @Composable
 fun CurrentEpochBlock(viewModel: GetBlockViewModel) {
-    val epoch by viewModel.epoch.collectAsState()
+    val supply by viewModel.stack.collectAsState()
 
     Box(
         modifier = Modifier
-            .background(color = AppColors.BackgroundInfo)
-            .height(100.dp)
+            .background(AppColors.BackgroundInfo, shape = RoundedCornerShape(12.dp))
+            .fillMaxWidth()
     ) {
-        Column {
+        Column(
+            modifier = Modifier
+                .padding(10.dp)
+        ) {
             Text(
                 text = "Epoch",
                 fontSize = 20.sp
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                text = epoch.toString(),
+                text = supply.epoch.toString(),
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
+            Column {
+                Column {
+                    Text(
+                        text = "Slot Range",
+                    )
+                    Text(
+                        text = "${supply.blockHeightEpoch} to ${supply.absoluteSlotEpoch}",
+                    )
+
+                }
+                Column {
+                    Text(
+                        text = "Time Remain",
+                    )
+                    Text(
+                        text = "SOL Supply",
+                    )
+
+                }
+            }
         }
     }
 }
@@ -170,6 +222,6 @@ object AppColors {
     val Pink = Color(0xFFD150EF)
     val Blue = Color(0xFF0B6FDA)
     val Turquoise = Color(0xFF00E8B4)
-    val Background = Color(0xFFf6f6f6)
-    val BackgroundInfo = Color(0x0FFFFFFF)
+    val Background = Color(0xFFFFFFFF)
+    val BackgroundInfo = Color(0xFFC5C5C5)
 }
