@@ -4,21 +4,22 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tyshko.getblock.data.repository.RpcRepository
-import com.tyshko.getblock.models.epoch.GetEpochInfo
 import com.tyshko.getblock.models.rpc.RpcResponse
-import com.tyshko.getblock.models.supply.GetSupply
+import com.tyshko.getblock.models.stack.UiStack
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 
 class GetBlockViewModel : ViewModel() {
+    companion object{
+        private val TIME_OUT: Long = 60_000
+    }
+
     private val repository: RpcRepository = RpcRepository()
 
-    private var _epoch = MutableStateFlow<GetEpochInfo?>(null)
-    val epoch: StateFlow<GetEpochInfo?> get() = _epoch
-
-    private val _supply = MutableStateFlow<GetSupply?>(null)
-    val supply: StateFlow<GetSupply?> get() = _supply
+    private val _stack = MutableStateFlow(UiStack())
+    val stack: StateFlow<UiStack> = _stack.asStateFlow()
 
     init {
         fetchEpoch()
@@ -27,29 +28,53 @@ class GetBlockViewModel : ViewModel() {
 
     fun fetchEpoch() {
         viewModelScope.launch {
-            try {
-                val response = repository.getEpoch()
-                _epoch.value = response.result
-            } catch (e: Exception) {
-                _epoch.value = null
-                Log.e("GetBlockViewModel", "Ошибка при получении Epoch: ${e.message}", e)
+            while (true) {
+                try {
+                    val response = repository.getEpoch()
+
+                    val absoluteSlot = response.result?.absoluteSlot
+                    val blockHeight = response.result?.blockHeight
+                    val epoch = response.result?.epoch
+                    val slotIndex = response.result?.slotIndex
+                    val slotsInEpoch = response.result?.slotsInEpoch
+
+                    _stack.value = _stack.value.copy(
+                        absoluteSlotEpoch = absoluteSlot ?: 0,
+                        blockHeightEpoch = blockHeight ?: 0,
+                        epoch = epoch ?: 0,
+                        slotIndexEpoch = slotIndex ?: 0,
+                        slotsInEpochEpoch = slotsInEpoch ?: 0,
+                    )
+
+                } catch (e: Exception) {
+                    Log.e("GetBlockViewModel", "Ошибка при получении Epoch: ${e.message}", e)
+                }
+                delay(TIME_OUT)
             }
         }
     }
 
     fun fetchSupply() {
         viewModelScope.launch {
-            try {
-                val response: RpcResponse<GetSupply> = repository.getSupply()
-                _supply.value = response.result
-            } catch (e: Exception) {
-                _supply.value = null
-                Log.e("GetBlockViewModel", "Ошибка при получении Supply: ${e.message}", e)
+            while (true) {
+                try {
+                    val response = repository.getSupply()
+
+                    val circulating = response.result?.value?.circulating
+                    val nonCirculating = response.result?.value?.nonCirculating
+                    val total = response.result?.value?.total
+
+                    _stack.value = _stack.value.copy(
+                        circulatingSupply = circulating ?: 0L,
+                        nonCirculatingSupply = nonCirculating ?: 0L,
+                        totalSupply = total ?: 0L,
+                    )
+
+                } catch (e: Exception) {
+                    Log.e("GetBlockViewModel", "Ошибка при получении Supply: ${e.message}", e)
+                }
+                delay(TIME_OUT)
             }
         }
-    }
-
-    companion object{
-        const val TIME_OUT = 60_000
     }
 }

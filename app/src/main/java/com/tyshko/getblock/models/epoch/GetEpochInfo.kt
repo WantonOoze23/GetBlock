@@ -1,7 +1,8 @@
 package com.tyshko.getblock.models.epoch
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class GetEpochInfo(
-    val id: Int,
-    val jsonrpc: String,
-    val result: Result
+    val result: EpochResult
 )

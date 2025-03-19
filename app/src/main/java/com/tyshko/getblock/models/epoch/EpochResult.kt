@@ -1,6 +1,9 @@
 package com.tyshko.getblock.models.epoch
 
-data class Result(
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class EpochResult(
     val absoluteSlot: Int,
     val blockHeight: Int,
     val epoch: Int,

@@ -2,7 +2,7 @@ package com.tyshko.getblock.data.repository
 
 import android.util.Log
 import com.tyshko.getblock.data.HTTPRouts
-import com.tyshko.getblock.models.block.GetBlock
+import com.tyshko.getblock.models.epoch.EpochResult
 import com.tyshko.getblock.models.epoch.GetEpochInfo
 import com.tyshko.getblock.models.rpc.RpcRequest
 import com.tyshko.getblock.models.rpc.RpcResponse
@@ -32,16 +32,15 @@ class RpcRepository {
         }
     }
 
-    suspend fun getEpoch(): RpcResponse<GetEpochInfo>{
+    suspend fun getEpoch(): RpcResponse<EpochResult>{
         val request = RpcRequest(method = "getEpochInfo")
 
         val response = client.post(HTTPRouts.BASE_URL){
             contentType(ContentType.Application.Json)
             header("x-api-key", HTTPRouts.X_API_KEY)
             setBody(request)
-        }.body<RpcResponse<GetEpochInfo>>()
-
-        return response
+        }
+        return response.body<RpcResponse<EpochResult>>()
     }
 
     suspend fun getSupply(): RpcResponse<GetSupply>{
