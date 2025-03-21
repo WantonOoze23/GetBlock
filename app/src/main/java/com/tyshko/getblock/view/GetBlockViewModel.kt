@@ -31,18 +31,18 @@ class GetBlockViewModel : ViewModel() {
                 try {
                     val response = repository.getEpoch()
 
-                    val absoluteSlot = response.result.absoluteSlot
-                    val blockHeight = response.result.blockHeight
                     val epoch = response.result.epoch
-                    val slotIndex = response.result.slotIndex
-                    val slotsInEpoch = response.result.slotsInEpoch
+                    val absoluteSlot = response.result.absoluteSlot
+
+                    val slotRangeStart = epoch * response.result.slotsInEpoch
+                    val slotRangeEnd = slotRangeStart + response.result.slotsInEpoch - 1
+                    val timeRemaining = countTime(absoluteSlot.toLong(), slotRangeEnd.toLong())
 
                     _stack.value = _stack.value.copy(
-                        absoluteSlotEpoch = absoluteSlot,
-                        blockHeightEpoch = blockHeight,
                         epoch = epoch,
-                        slotIndexEpoch = slotIndex,
-                        slotsInEpochEpoch = slotsInEpoch,
+                        slotRangeStart = slotRangeStart,
+                        slotRangeEnd = slotRangeEnd,
+                        timeRemaining = timeRemaining
                     )
 
                 } catch (e: Exception) {
@@ -82,5 +82,17 @@ class GetBlockViewModel : ViewModel() {
                 delay(TIME_OUT)
             }
         }
+    }
+
+    private fun countTime(currentSlot: Long, endSlot: Long): String {
+        val remainSlots = endSlot - currentSlot
+        val remainSeconds = (remainSlots * 0.4).toLong()
+
+        val days = (remainSeconds / 86400).toInt()
+        val hours = ((remainSeconds % 86400) / 3600).toInt()
+        val minutes = ((remainSeconds % 3600) / 60).toInt()
+        val seconds = (remainSeconds % 60).toInt()
+
+        return "%dd %02dh %02dm %02ds".format(days, hours, minutes, seconds)
     }
 }
