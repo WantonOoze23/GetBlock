@@ -26,6 +26,5 @@ data class UiStack(
         previousBlockHash = ""
     ),
 
-    //Highest slot
-    val highestSlot: Long = 0
+    val blocks: List<Block> = emptyList(),
 )

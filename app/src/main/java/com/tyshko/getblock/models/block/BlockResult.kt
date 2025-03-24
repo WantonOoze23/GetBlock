@@ -1,8 +1,11 @@
 package com.tyshko.getblock.models.block
 
-data class Result(
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class BlockResult(
     val blockHeight: Int,
-    val blockTime: Int,
+    val blockTime: Long,
     val blockhash: String,
     val parentSlot: Int,
     val previousBlockhash: String,

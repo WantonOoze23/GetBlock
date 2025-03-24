@@ -4,8 +4,6 @@ package com.tyshko.getblock.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -14,13 +12,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.tyshko.getblock.ui.components.BlockCard
+import com.tyshko.getblock.ui.components.BlockInfo
 import com.tyshko.getblock.view.GetBlockViewModel
 
 @Composable
-fun MainPage(viewModel: GetBlockViewModel) {
-    var text by remember { mutableStateOf("") }
-
+fun MainPage(viewModel: GetBlockViewModel, navController: NavHostController) {
     val stack by viewModel.stack.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -66,12 +64,7 @@ fun MainPage(viewModel: GetBlockViewModel) {
                     modifier = Modifier.fillMaxWidth()
                 )*/
             }
-            Icon(
-                modifier = Modifier.statusBarsPadding(),
-                imageVector = Icons.Default.KeyboardArrowLeft,
-                contentDescription = "Search",
-                tint = Color.White
-            )
+
         }
 
         LazyColumn(
@@ -105,6 +98,18 @@ fun MainPage(viewModel: GetBlockViewModel) {
                 )
             }
             item {
+                Spacer(Modifier.height(20.dp))
+            }
+            item {
+                BlockInfo(
+                    blockList = stack.blocks,
+                    onBlockClick = { block ->
+                        viewModel.setCurrentBlock(block)
+                        navController.navigate("block")
+                    }
+                )
+            }
+            item {
                 Text(text = stack.toString())
             }
 
@@ -119,4 +124,5 @@ object AppColors {
     val Turquoise = Color(0xFF00E8B4)
     val Background = Color(0xFFFFFFFF)
     val BackgroundInfo = Color(0xFFF1F1F1)
+    val Link = Color(0xFF0B46DA)
 }

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tyshko.getblock.data.repository.RpcRepository
+import com.tyshko.getblock.models.stack.Block
 import com.tyshko.getblock.models.stack.UiStack
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -12,13 +13,17 @@ import kotlinx.coroutines.launch
 
 class GetBlockViewModel : ViewModel() {
     companion object{
-        private val TIME_OUT: Long = 60_000
+        private val TIME_OUT: Long = 600_000L
+        private const val amountOfBlock: Int = 5
     }
 
     private val repository: RpcRepository = RpcRepository()
 
     private val _stack = MutableStateFlow(UiStack())
     val stack: StateFlow<UiStack> = _stack.asStateFlow()
+
+    private val _currentBlock = MutableStateFlow<Block?>(null)
+    val currentBlock: StateFlow<Block?> = _currentBlock
 
     init {
         fetchEpoch()
@@ -44,7 +49,7 @@ class GetBlockViewModel : ViewModel() {
                         slotRangeEnd = slotRangeEnd,
                         timeRemaining = timeRemaining
                     )
-
+                    fetchBlocks(slotRangeStart.toLong(), slotRangeEnd.toLong(), epoch)
                 } catch (e: Exception) {
                     Log.e("GetBlockViewModel", "Ошибка при получении Epoch: ${e.message}", e)
                 }
@@ -82,6 +87,66 @@ class GetBlockViewModel : ViewModel() {
                 delay(TIME_OUT)
             }
         }
+    }
+
+    fun fetchBlock(blockNumber: Long){
+        viewModelScope.launch {
+            while (true) {
+                try {
+                    val block = repository.getBlock(blockNumber)
+
+                    _stack.update { current ->
+                        current.copy(
+                            currentBlock = Block(
+                                block = blockNumber,
+                                signature = block.result.blockhash,
+                                time = block.result.blockTime,
+                                epoch = _stack.value.epoch,
+                                rewardLamports = block.result.rewards[0].lamports,
+                                previousBlockHash = block.result.previousBlockhash
+                            )
+                        )
+                    }
+
+                } catch (e: Exception){
+                    Log.e("GetBlockViewModel", "Ошибка при получении Block: ${e.message}", e)
+                }
+                delay(TIME_OUT)
+            }
+        }
+    }
+
+    fun fetchBlocks(startSlot: Long, endSlot: Long? = null, epoch: Int) {
+        viewModelScope.launch {
+            while (true) {
+                try {
+                    val response = repository.getBlocks(startSlot, endSlot).takeLast(amountOfBlock)
+                    val ListOfBlocks = response.map { block ->
+                        val blockInfo = repository.getBlock(block)
+                        Block(
+                            time = blockInfo.result.blockTime,
+                            block = block,
+                            signature = blockInfo.result.blockhash,
+                            epoch = epoch,
+                            rewardLamports = blockInfo.result.rewards[0].lamports,
+                            previousBlockHash = blockInfo.result.previousBlockhash
+                        )
+                    }
+
+                    _stack.update { current ->
+                        current.copy(
+                            blocks = ListOfBlocks
+                        ) }
+                } catch (e: Exception) {
+                    Log.e("GetBlockViewModel", "Ошибка при получении блоков: ${e.message}", e)
+                }
+                delay(TIME_OUT)
+            }
+        }
+    }
+
+    fun setCurrentBlock(block: Block) {
+        _currentBlock.value = block
     }
 
     private fun countTime(currentSlot: Long, endSlot: Long): String {
