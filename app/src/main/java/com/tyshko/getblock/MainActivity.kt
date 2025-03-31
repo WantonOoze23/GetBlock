@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.tyshko.getblock
 
 import android.os.Bundle
@@ -40,7 +42,17 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation(navController: NavHostController, viewModel: GetBlockViewModel) {
     NavHost(navController, startDestination = "main") {
-        composable("main") { MainPage(viewModel, navController) }
-        composable("block") { BlockPage(viewModel) }
+        composable("main") {
+            MainPage(
+                viewModel,
+                navController,
+                onSearchClick = {
+                    navController.navigate("block")
+                }
+            )
+        }
+        composable("block") {
+            BlockPage(viewModel)
+        }
     }
 }

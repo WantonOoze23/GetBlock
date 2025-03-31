@@ -23,11 +23,8 @@ fun BlockCard(
 
     secondSubTitle: String = "",
     secondSubValue: String = "",
-
-    onClick: () -> Unit = {},
 ){
     Card(
-        onClick = onClick,
         modifier = Modifier
             .background(AppColors.Background, shape = RoundedCornerShape(12.dp))
             .fillMaxWidth()
