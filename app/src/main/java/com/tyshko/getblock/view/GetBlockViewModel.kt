@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class GetBlockViewModel : ViewModel() {
     companion object{
-        private val TIME_OUT: Long = 600_000L
+        private val TIME_OUT: Long = 60_000L
         private const val amountOfBlock: Int = 5
     }
 
@@ -21,9 +21,6 @@ class GetBlockViewModel : ViewModel() {
 
     private val _stack = MutableStateFlow(UiStack())
     val stack: StateFlow<UiStack> = _stack.asStateFlow()
-
-    private val _currentBlock = MutableStateFlow<Block?>(null)
-    val currentBlock: StateFlow<Block?> = _currentBlock
 
     init {
         fetchEpoch()
@@ -95,19 +92,20 @@ class GetBlockViewModel : ViewModel() {
                 try {
                     val block = repository.getBlock(blockNumber)
 
+                    val blockModel = Block(
+                        block = blockNumber,
+                        signature = block.result.blockhash,
+                        time = block.result.blockTime,
+                        epoch = _stack.value.epoch,
+                        rewardLamports = block.result.rewards[0].lamports,
+                        previousBlockHash = block.result.previousBlockhash
+                    )
+
                     _stack.update { current ->
                         current.copy(
-                            currentBlock = Block(
-                                block = blockNumber,
-                                signature = block.result.blockhash,
-                                time = block.result.blockTime,
-                                epoch = _stack.value.epoch,
-                                rewardLamports = block.result.rewards[0].lamports,
-                                previousBlockHash = block.result.previousBlockhash
-                            )
+                            currentBlock = blockModel
                         )
                     }
-
                 } catch (e: Exception){
                     Log.e("GetBlockViewModel", "Ошибка при получении Block: ${e.message}", e)
                 }
@@ -146,7 +144,11 @@ class GetBlockViewModel : ViewModel() {
     }
 
     fun setCurrentBlock(block: Block) {
-        _currentBlock.value = block
+        _stack.update { currentState ->
+            currentState.copy(
+                currentBlock = block
+            )
+        }
     }
 
     private fun countTime(currentSlot: Long, endSlot: Long): String {

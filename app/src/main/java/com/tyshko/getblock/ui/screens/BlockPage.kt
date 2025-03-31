@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -14,16 +15,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.unit.*
 import com.tyshko.getblock.models.stack.Block
+import com.tyshko.getblock.models.stack.UiStack
 import com.tyshko.getblock.view.GetBlockViewModel
 
 @Composable
 fun BlockPage(viewModel: GetBlockViewModel) {
-    val block by viewModel.currentBlock.collectAsState()
+    val block by viewModel.stack.collectAsState()
 
     val solToUSDT: Double = 144.44
 
     if (block == null) {
-        Text("No block selected")
+        Column(
+            modifier = Modifier.statusBarsPadding().padding(horizontal = 10.dp)
+        ) {
+            Text("Loading...")
+        }
         return
     }
 
@@ -42,26 +48,25 @@ fun BlockPage(viewModel: GetBlockViewModel) {
                 .padding(vertical = 20.dp, horizontal = 20.dp)
                 .fillMaxWidth()
         ) {
-            BlockGrid(block!!, solToUSDT)
+            BlockGrid(block, solToUSDT)
         }
     }
-
 }
 
 @Composable
-fun BlockGrid(block: Block, solPrice: Double) {
+fun BlockGrid(block: UiStack, solPrice: Double) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
     ) {
         val items = listOf(
-            "Block" to block.block.toString(),
-            "Signature" to block.signature,
-            "Time" to calculateTime(block.time),
-            "Epoch" to block.epoch.toString(),
-            "Reward" to calculatePrice(block.rewardLamports, solPrice),
-            "Previous block" to block.previousBlockHash
+            "Block" to block.currentBlock.block.toString(),
+            "Signature" to block.currentBlock.signature,
+            "Time" to calculateTime(block.currentBlock.time),
+            "Epoch" to block.currentBlock.epoch.toString(),
+            "Reward" to calculatePrice(block.currentBlock.rewardLamports, solPrice),
+            "Previous block" to block.currentBlock.previousBlockHash
         )
 
         items.forEachIndexed { index, (title, value) ->

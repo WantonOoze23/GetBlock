@@ -1,6 +1,5 @@
 package com.tyshko.getblock.ui.screens
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,13 +12,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.tyshko.getblock.models.stack.Block
 import com.tyshko.getblock.ui.components.BlockCard
 import com.tyshko.getblock.ui.components.BlockInfo
+import com.tyshko.getblock.ui.components.HeaderSearchBar
 import com.tyshko.getblock.view.GetBlockViewModel
 
+@ExperimentalMaterial3Api
 @Composable
-fun MainPage(viewModel: GetBlockViewModel, navController: NavHostController) {
+fun MainPage(
+    viewModel: GetBlockViewModel,
+    navController: NavHostController,
+    onSearchClick: () -> Unit = {},
+) {
     val stack by viewModel.stack.collectAsState()
+    var searchText by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         viewModel.fetchEpoch()
@@ -57,12 +64,10 @@ fun MainPage(viewModel: GetBlockViewModel, navController: NavHostController) {
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.height(15.dp))
-                /*SearchBar(
-                    text = searchText,
-                    onTextChange = { searchText = it },
-                    onSearchClick = { /* TODO: Реализовать поиск */ },
-                    modifier = Modifier.fillMaxWidth()
-                )*/
+                HeaderSearchBar(
+                    viewModel = viewModel,
+                    onSearchClick = onSearchClick
+                )
             }
 
         }
@@ -71,8 +76,8 @@ fun MainPage(viewModel: GetBlockViewModel, navController: NavHostController) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = AppColors.BackgroundInfo)
-                .padding(horizontal =  20.dp)
-                .padding(top = 10.dp)
+                .padding(horizontal = 20.dp)
+                .padding(top = 10.dp, bottom = 10.dp)
         ) {
             item {
                 BlockCard(
@@ -109,10 +114,6 @@ fun MainPage(viewModel: GetBlockViewModel, navController: NavHostController) {
                     }
                 )
             }
-            item {
-                Text(text = stack.toString())
-            }
-
         }
     }
 }
