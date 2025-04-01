@@ -13,9 +13,10 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.encodeToJsonElement
 
 class RpcRepository {
@@ -33,74 +34,63 @@ class RpcRepository {
         }
     }
 
-    suspend fun getEpoch(): RpcResponse<EpochResult>{
-        val request = RpcRequest(method = "getEpochInfo")
+    private suspend inline fun <reified T> executeRpcRequest(
+        method: String,
+        params: List<JsonElement>? = emptyList(),
+        logTag: String? = null
+    ): RpcResponse<T> {
+        val request = params?.let { RpcRequest(method = method, params = it) }
 
-        val response = client.post(HTTPRouts.BASE_URL){
+        val response = client.post(HTTPRouts.BASE_URL) {
             contentType(ContentType.Application.Json)
             header("x-api-key", HTTPRouts.X_API_KEY)
             setBody(request)
         }
-        return response.body<RpcResponse<EpochResult>>()
-    }
 
-    suspend fun getSupply(): RpcResponse<GetSupply>{
-        val request = RpcRequest(method = "getSupply")
-
-        val response = client.post(HTTPRouts.BASE_URL){
-            contentType(ContentType.Application.Json)
-            header("x-api-key", HTTPRouts.X_API_KEY)
-            setBody(request)
+        logTag?.let {
+            Log.d(it, "Response for $method: $response")
         }
-        return response.body<RpcResponse<GetSupply>>()
+
+        return response.body()
     }
 
-    suspend fun getBlock(blockNumber: Long): RpcResponse<BlockResult>{
-        val request = RpcRequest(
-            method = "getBlock",
-            params = listOf(Json.encodeToJsonElement(blockNumber), Json.encodeToJsonElement(mapOf("maxSupportedTransactionVersion" to 0)))
+    suspend fun getEpoch(): RpcResponse<EpochResult> {
+        return executeRpcRequest(method = "getEpochInfo")
+    }
+
+    suspend fun getSupply(): RpcResponse<GetSupply> {
+        return executeRpcRequest(method = "getSupply")
+    }
+
+    suspend fun getBlock(blockNumber: Long): RpcResponse<BlockResult> {
+        val params = listOf(
+            Json.encodeToJsonElement(blockNumber),
+            Json.encodeToJsonElement(mapOf("maxSupportedTransactionVersion" to 0))
         )
 
-        val response = client.post(HTTPRouts.BASE_URL){
-            contentType(ContentType.Application.Json)
-            header("x-api-key", HTTPRouts.X_API_KEY)
-            setBody(request)
-        }
-        Log.d("RPC", "get block response $response")
-        return response.body<RpcResponse<BlockResult>>()
+        return executeRpcRequest(
+            method = "getBlock",
+            params = params,
+            logTag = "RPC"
+        )
     }
 
     suspend fun getBlocks(startSlot: Long, endSlot: Long? = null): List<Long> {
-        val params = if (endSlot != null) {
-            listOf(Json.encodeToJsonElement(startSlot), Json.encodeToJsonElement(endSlot))
+        val jsonParams = if (endSlot != null) {
+            listOf(
+                Json.encodeToJsonElement(startSlot),
+                Json.encodeToJsonElement(endSlot)
+            )
         } else {
-            listOf(Json.encodeToJsonElement(startSlot), null)
+            listOf(
+                Json.encodeToJsonElement(startSlot),
+                JsonNull
+            )
         }
 
-        val request = RpcRequest(
+        return executeRpcRequest<List<Long>>(
             method = "getBlocks",
-            params = params.map { Json.encodeToJsonElement(it) }
-        )
-
-        val response = client.post(HTTPRouts.BASE_URL) {
-            contentType(ContentType.Application.Json)
-            header("x-api-key", HTTPRouts.X_API_KEY)
-            setBody(request)
-        }
-        return response.body<RpcResponse<List<Long>>>().result
-    }
-
-    suspend fun getSlot(): RpcResponse<Long> {
-        val request = RpcRequest(
-            method = "getSlot"
-        )
-
-        val response = client.post(HTTPRouts.BASE_URL) {
-            contentType(ContentType.Application.Json)
-            header("x-api-key", HTTPRouts.X_API_KEY)
-            setBody(request)
-        }
-        Log.d("RPC", "get slot response $response")
-        return response.body<RpcResponse<Long>>()
+            params = jsonParams
+        ).result
     }
 }

@@ -13,9 +13,9 @@ import com.tyshko.getblock.view.GetBlockViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HeaderSearchBar(
+    modifier: Modifier = Modifier,
     viewModel: GetBlockViewModel,
     onSearchClick: () -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var showErrorDialog by remember { mutableStateOf(false) }

@@ -12,7 +12,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.tyshko.getblock.models.stack.Block
 import com.tyshko.getblock.ui.components.BlockCard
 import com.tyshko.getblock.ui.components.BlockInfo
 import com.tyshko.getblock.ui.components.HeaderSearchBar
@@ -26,12 +25,6 @@ fun MainPage(
     onSearchClick: () -> Unit = {},
 ) {
     val stack by viewModel.stack.collectAsState()
-    var searchText by remember { mutableStateOf("") }
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchEpoch()
-        viewModel.fetchSupply()
-    }
 
     Column {
         Box(

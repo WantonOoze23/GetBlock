@@ -13,8 +13,6 @@ import com.tyshko.getblock.ui.screens.AppColors
 
 @Composable
 fun BlockCard(
-    modifier: Modifier = Modifier,
-
     title: String  = "",
     mainValue: String = "",
 
