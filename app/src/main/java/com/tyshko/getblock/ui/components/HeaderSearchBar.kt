@@ -46,7 +46,7 @@ fun HeaderSearchBar(
     if (showErrorDialog) {
         AlertDialog(
             onDismissRequest = { showErrorDialog = false },
-            title = { Text("Error inpur") },
+            title = { Text("Error input") },
             text = { Text("Wrong input. Try one more time") },
             confirmButton = {
                 TextButton(onClick = { showErrorDialog = false }) {

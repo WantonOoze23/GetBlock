@@ -62,7 +62,6 @@ fun MainPage(
                     onSearchClick = onSearchClick
                 )
             }
-
         }
 
         LazyColumn(
@@ -118,5 +117,4 @@ object AppColors {
     val Turquoise = Color(0xFF00E8B4)
     val Background = Color(0xFFFFFFFF)
     val BackgroundInfo = Color(0xFFF1F1F1)
-    val Link = Color(0xFF0B46DA)
 }
