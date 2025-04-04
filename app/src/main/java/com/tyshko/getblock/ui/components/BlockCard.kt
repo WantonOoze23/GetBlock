@@ -1,6 +1,5 @@
 package com.tyshko.getblock.ui.components
 
-
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
@@ -13,8 +12,6 @@ import com.tyshko.getblock.ui.screens.AppColors
 
 @Composable
 fun BlockCard(
-    modifier: Modifier = Modifier,
-
     title: String  = "",
     mainValue: String = "",
 

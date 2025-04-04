@@ -7,14 +7,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.unit.*
-import com.tyshko.getblock.models.stack.Block
 import com.tyshko.getblock.models.stack.UiStack
 import com.tyshko.getblock.view.GetBlockViewModel
 
@@ -23,15 +21,6 @@ fun BlockPage(viewModel: GetBlockViewModel) {
     val block by viewModel.stack.collectAsState()
 
     val solToUSDT: Double = 144.44
-
-    if (block == null) {
-        Column(
-            modifier = Modifier.statusBarsPadding().padding(horizontal = 10.dp)
-        ) {
-            Text("Loading...")
-        }
-        return
-    }
 
     Column(
         modifier = Modifier
@@ -96,7 +85,6 @@ fun BlockGrid(block: UiStack, solPrice: Double) {
 }
 
 fun calculatePrice(rewardLamports: Int, solToUSDT: Double): String {
-    if (rewardLamports == null) return "N/A"
 
     val solReward = rewardLamports / 1_000_000_000.0
     val usdReward = solReward * solToUSDT

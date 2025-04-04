@@ -8,12 +8,13 @@ import com.tyshko.getblock.models.stack.Block
 import com.tyshko.getblock.models.stack.UiStack
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 
 class GetBlockViewModel : ViewModel() {
     companion object{
-        private val TIME_OUT: Long = 60_000L
+        private const val TIME_OUT: Long = 60_000L
         private const val amountOfBlock: Int = 5
     }
 
@@ -29,7 +30,7 @@ class GetBlockViewModel : ViewModel() {
 
     fun fetchEpoch() {
         viewModelScope.launch {
-            while (true) {
+            while (isActive) {
                 try {
                     val response = repository.getEpoch()
 
@@ -57,7 +58,7 @@ class GetBlockViewModel : ViewModel() {
 
     fun fetchSupply() {
         viewModelScope.launch {
-            while (true) {
+            while (isActive) {
                 try {
                     val response = repository.getSupply()
 
@@ -88,7 +89,7 @@ class GetBlockViewModel : ViewModel() {
 
     fun fetchBlock(blockNumber: Long){
         viewModelScope.launch {
-            while (true) {
+            while (isActive) {
                 try {
                     val block = repository.getBlock(blockNumber)
 
@@ -116,7 +117,7 @@ class GetBlockViewModel : ViewModel() {
 
     fun fetchBlocks(startSlot: Long, endSlot: Long? = null, epoch: Int) {
         viewModelScope.launch {
-            while (true) {
+            while (isActive) {
                 try {
                     val response = repository.getBlocks(startSlot, endSlot).takeLast(amountOfBlock)
                     val ListOfBlocks = response.map { block ->

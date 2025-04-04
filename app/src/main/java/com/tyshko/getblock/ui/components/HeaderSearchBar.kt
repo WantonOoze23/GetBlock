@@ -13,9 +13,9 @@ import com.tyshko.getblock.view.GetBlockViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HeaderSearchBar(
+    modifier: Modifier = Modifier,
     viewModel: GetBlockViewModel,
     onSearchClick: () -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var showErrorDialog by remember { mutableStateOf(false) }
@@ -46,7 +46,7 @@ fun HeaderSearchBar(
     if (showErrorDialog) {
         AlertDialog(
             onDismissRequest = { showErrorDialog = false },
-            title = { Text("Error inpur") },
+            title = { Text("Error input") },
             text = { Text("Wrong input. Try one more time") },
             confirmButton = {
                 TextButton(onClick = { showErrorDialog = false }) {
