@@ -3,7 +3,7 @@ package com.tyshko.getblock.view
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tyshko.getblock.data.repository.RpcRepository
+import com.tyshko.getblock.data.repository.RpcRepositoryImpl
 import com.tyshko.getblock.models.stack.Block
 import com.tyshko.getblock.models.stack.UiStack
 import kotlinx.coroutines.delay
@@ -18,7 +18,7 @@ class GetBlockViewModel : ViewModel() {
         private const val amountOfBlock: Int = 5
     }
 
-    private val repository: RpcRepository = RpcRepository()
+    private val repository: RpcRepositoryImpl = RpcRepositoryImpl()
 
     private val _stack = MutableStateFlow(UiStack())
     val stack: StateFlow<UiStack> = _stack.asStateFlow()
