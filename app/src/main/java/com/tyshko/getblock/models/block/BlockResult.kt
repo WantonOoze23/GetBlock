@@ -1,8 +1,10 @@
 package com.tyshko.getblock.models.block
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
 @Serializable
+@JsonIgnoreUnknownKeys
 data class BlockResult(
     val blockHeight: Int,
     val blockTime: Long,
