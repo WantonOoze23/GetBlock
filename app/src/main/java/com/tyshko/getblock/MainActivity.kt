@@ -9,12 +9,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.ViewModelProvider
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
-import com.tyshko.getblock.ui.screens.MainPage
-import com.tyshko.getblock.ui.screens.BlockPage
 import com.tyshko.getblock.ui.theme.GetBlockTheme
 import com.tyshko.getblock.view.GetBlockViewModel
 
@@ -39,20 +35,4 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun AppNavigation(navController: NavHostController, viewModel: GetBlockViewModel) {
-    NavHost(navController, startDestination = "main") {
-        composable("main") {
-            MainPage(
-                viewModel,
-                navController,
-                onSearchClick = {
-                    navController.navigate("block")
-                }
-            )
-        }
-        composable("block") {
-            BlockPage(viewModel)
-        }
-    }
-}
+
