@@ -42,7 +42,6 @@ fun HeaderSearchBar(
             .fillMaxWidth()
             .clickable { focusManager.clearFocus() }
     ) {}
-
     if (showErrorDialog) {
         AlertDialog(
             onDismissRequest = { showErrorDialog = false },

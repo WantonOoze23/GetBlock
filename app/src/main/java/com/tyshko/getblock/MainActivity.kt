@@ -13,13 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.*
 import com.tyshko.getblock.ui.theme.GetBlockTheme
 import com.tyshko.getblock.view.GetBlockViewModel
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val getBlockModel = ViewModelProvider(this)[GetBlockViewModel::class.java]
+//        val getBlockModel = ViewModelProvider(this)[GetBlockViewModel::class.java]
 
         setContent {
             GetBlockTheme {
@@ -28,6 +29,9 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
+
+                    val getBlockModel: GetBlockViewModel = koinViewModel()
+
                     AppNavigation(navController, getBlockModel)
                 }
             }
