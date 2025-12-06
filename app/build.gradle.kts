@@ -66,6 +66,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // mock
+
+    testImplementation(libs.mockk)
+    androidTestImplementation(libs.mockk)
+    androidTestImplementation(libs.mockk.android)
+
     //val ktorVersion= "3.1.0"
 
     implementation(libs.kotlinx.serialization.json)
