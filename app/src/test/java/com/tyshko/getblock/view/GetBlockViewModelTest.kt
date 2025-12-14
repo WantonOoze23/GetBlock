@@ -45,6 +45,7 @@ class GetBlockViewModelTest {
 
     @After
     fun tearDown() {
+        viewModel?.viewModelScope?.coroutineContext?.cancelChildren()
         Dispatchers.resetMain()
         unmockkAll()
     }
@@ -276,7 +277,6 @@ class GetBlockViewModelTest {
     @Test
     fun `fetchSupply handles zero values without arithmetic exceptions`() = runTest {
         // GIVEN
-        // Сценарій: Тільки запустили мережу, або тестова мережа, де нічого не циркулює
         val circulating = 0L
         val nonCirculating = 100L
         val total = 100L
@@ -299,5 +299,65 @@ class GetBlockViewModelTest {
         assertEquals("Non-Circulating percent should be 100.0", 100.0, state.percentNonCirculatingSupply, 0.01)
 
         viewModel.viewModelScope.coroutineContext.cancelChildren()
+    }
+
+    @Test
+    fun `fetchBlocks_empty_response_results_in_empty_blocks`() = runTest {
+        // GIVEN
+        coEvery { repository.getEpoch() } throws Exception("Ignore")
+        coEvery { repository.getSupply() } throws Exception("Ignore")
+        viewModel = GetBlockViewModel(repository)
+
+        val startSlot = 100L
+        coEvery { repository.getBlocks(startSlot, any()) } returns emptyList()
+
+        // WHEN
+        viewModel.fetchBlocks(startSlot, epoch = 1)
+        testDispatcher.scheduler.runCurrent()
+
+        // THEN
+        val blocks = viewModel.stack.value.blocks
+        org.junit.Assert.assertTrue("Blocks should be empty when repository returns empty", blocks.isEmpty())
+
+        viewModel.viewModelScope.coroutineContext.cancelChildren()
+    }
+
+    @Test
+    fun `fetchSupply_total_zero_document_behavior_nan_or_infinite`() = runTest {
+        // CASE 1: total == 0 and circulating == 0 -> 0/0 => NaN
+        run {
+            val value = Value(0L, 0L, emptyList(), 0L)
+            val response = RpcResponse("id", "2.0", GetSupply(Context("1", 1), value), null)
+            coEvery { repository.getSupply() } returns response
+            coEvery { repository.getEpoch() } throws Exception("Ignore")
+
+            viewModel = GetBlockViewModel(repository)
+            testDispatcher.scheduler.runCurrent()
+
+            val state = viewModel.stack.value
+            org.junit.Assert.assertTrue("percentCirculating should be NaN when total==0 and circulating==0",
+                state.percentCirculatingSupply.isNaN())
+            org.junit.Assert.assertTrue("percentNonCirculating should be NaN when total==0 and nonCirculating==0",
+                state.percentNonCirculatingSupply.isNaN())
+
+            viewModel.viewModelScope.coroutineContext.cancelChildren()
+        }
+
+        // CASE 2: total == 0 and circulating > 0 -> Infinity
+        run {
+            val value = Value(10L, 0L, emptyList(), 0L)
+            val response = RpcResponse("id", "2.0", GetSupply(Context("1", 1), value), null)
+            coEvery { repository.getSupply() } returns response
+            coEvery { repository.getEpoch() } throws Exception("Ignore")
+
+            viewModel = GetBlockViewModel(repository)
+            testDispatcher.scheduler.runCurrent()
+
+            val state = viewModel.stack.value
+            org.junit.Assert.assertTrue("percentCirculating should be Infinite when total==0 and circulating>0",
+                state.percentCirculatingSupply.isInfinite())
+
+            viewModel.viewModelScope.coroutineContext.cancelChildren()
+        }
     }
 }

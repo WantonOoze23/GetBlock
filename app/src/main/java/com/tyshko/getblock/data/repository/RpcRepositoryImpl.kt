@@ -18,19 +18,6 @@ import kotlinx.serialization.json.encodeToJsonElement
 
 class RpcRepositoryImpl(private val client: HttpClient) : RpcRepository {
 
-//    private val client = HttpClient {
-//        install(ContentNegotiation) {
-//            json(Json {
-//                encodeDefaults = true
-//                ignoreUnknownKeys = true
-//            })
-//        }
-//        install(Logging) {
-//            level = LogLevel.ALL
-//            logger = Logger.DEFAULT
-//        }
-//    }
-
     private suspend inline fun <reified T> executeRpcRequest(
         method: String,
         params: List<JsonElement>? = emptyList(),
