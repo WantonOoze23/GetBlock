@@ -57,6 +57,12 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.turbine)
+    testImplementation(libs.mockk)
+
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit4)
 
 
     androidTestImplementation(libs.androidx.junit)
@@ -65,6 +71,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.koin.test)
+    androidTestImplementation(libs.androidx.navigation.testing)
 
     //val ktorVersion= "3.1.0"
 
