@@ -9,30 +9,27 @@ import com.tyshko.getblock.models.rpc.RpcResponse
 import com.tyshko.getblock.models.supply.GetSupply
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.encodeToJsonElement
 
-class RpcRepositoryImpl : RpcRepository {
+class RpcRepositoryImpl(private val client: HttpClient) : RpcRepository {
 
-    private val client = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                encodeDefaults = true
-                ignoreUnknownKeys = true
-            })
-        }
-        install(Logging) {
-            level = LogLevel.ALL
-            logger = Logger.DEFAULT
-        }
-    }
+//    private val client = HttpClient {
+//        install(ContentNegotiation) {
+//            json(Json {
+//                encodeDefaults = true
+//                ignoreUnknownKeys = true
+//            })
+//        }
+//        install(Logging) {
+//            level = LogLevel.ALL
+//            logger = Logger.DEFAULT
+//        }
+//    }
 
     private suspend inline fun <reified T> executeRpcRequest(
         method: String,
