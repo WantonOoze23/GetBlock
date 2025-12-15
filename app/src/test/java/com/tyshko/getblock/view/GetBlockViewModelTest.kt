@@ -302,7 +302,7 @@ class GetBlockViewModelTest {
     }
 
     @Test
-    fun `fetchBlocks_empty_response_results_in_empty_blocks`() = runTest {
+    fun `fetchBlocks empty response results in empty blocks`() = runTest {
         // GIVEN
         coEvery { repository.getEpoch() } throws Exception("Ignore")
         coEvery { repository.getSupply() } throws Exception("Ignore")
@@ -323,7 +323,7 @@ class GetBlockViewModelTest {
     }
 
     @Test
-    fun `fetchSupply_total_zero_document_behavior_nan_or_infinite`() = runTest {
+    fun `fetchSupply total zero document behavior nan or infinite`() = runTest {
         // CASE 1: total == 0 and circulating == 0 -> 0/0 => NaN
         run {
             val value = Value(0L, 0L, emptyList(), 0L)
